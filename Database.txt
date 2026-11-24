@@ -1,0 +1,116 @@
+1. Login Command
+C:/xampp/mysql/bin //เข้าไป path นี้
+
+mysql -u root -p  //แบบ local
+mysql -h 49.229.108.173 -P 3308 -u it68a -p  //remote to server (pw : it68a@2025)
+mysql -h 49.229.108.173 -P 3308 -u it68b -p  //remote to server (pw : it68b@2025)
+
+
+2. CREATE DATABASE (สร้างฐานข้อมูล)
+CREATE DATABASE db_shop;
+
+3. SHOW DATABASE (แสดงฐานข้อมูล)
+show databases;
+
+4. USE DATABASE (เลือกใช้ฐานข้อมูล)
+use db_shop;
+
+5. CREATE TABLE (สร้างตาราง)
+CREATE TABLE tbl_users (
+id INT AUTO_INCREMENT PRIMARY KEY,
+firstname VARCHAR(100),
+fullname VARCHAR(200),
+lastname VARCHAR(100),
+username VARCHAR(100),
+password VARCHAR(255),
+status VARCHAR(20),
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+); 
+6. SHOW TABLES (แสดงตาราง)
+show tables;
+
+show columns from tbl_users;
+
+7. INSERT (Create - เพิ่มข้อมูล)
+INSERT INTO tbl_users (firstname, fullname, lastname, username, password, status) VALUES ('Anuchat', 'Anuchat Rungsiyanon', 'Rungsiyanon', 'anuchat', '123456', 'user');
+💡 ถ้ามีการเข้ารหัสรหัสผ่าน (hash) เช่น SHA2():
+
+ 
+INSERT INTO tbl_users (firstname, fullname, lastname, username, password, status) VALUES ('Anuchat', 'Anuchat Rungsiyanon', 'Rungsiyanon', 'anuchat', SHA2('123456', 256), 'user');
+8. SELECT (Read - อ่านข้อมูล)
+-- ดึงข้อมูลทั้งหมด
+SELECT * FROM tbl_users;
+
+-- ดึงข้อมูลเฉพาะ id ที่ต้องการ
+SELECT * FROM tbl_users WHERE id = 1;
+
+-- ดึงเฉพาะบางคอลัมน์
+SELECT id, fullname, username, status FROM tbl_users;
+9. UPDATE (Update - แก้ไขข้อมูล)
+UPDATE tbl_users SET firstname = 'Anuchat', lastname = 'Rungsiyanon', fullname = 'Anuchat Rungsiyanon', username = 'anuchat', status = 'user' WHERE id = 1;
+ถ้าต้องการอัปเดตรหัสผ่านใหม่ (แบบเข้ารหัส):
+
+ 
+UPDATE tbl_users SET password = SHA2('newpassword', 256) WHERE username = 'anuchat';
+10. DELETE (Delete - ลบข้อมูล)
+DELETE FROM tbl_users WHERE id = 1;
+ถ้าอยากลบทั้งหมด (ระวัง!)
+
+ 
+DELETE FROM tbl_users; //ลบแบบนับ id ไปเรื่อยๆ
+TRUNCATE TABLE tbl_users; //ลบแบบ reset id
+11. CREATE TABLE (สร้างตาราง)
+CREATE TABLE tbl_orders (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  order_number VARCHAR(50) UNIQUE,
+  total_amount DECIMAL(10,2) DEFAULT 0.00,
+  payment_status ENUM('pending','paid','cancelled','refunded') DEFAULT 'pending',
+  order_status ENUM('processing','shipped','delivered','cancelled') DEFAULT 'processing',
+  payment_method VARCHAR(50),
+  shipping_address TEXT,
+  note TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+#อธิบายฟิลด์แต่ละช่อง
+ฟิลด์	ประเภทข้อมูล	รายละเอียด
+id	INT, PK	รหัสคำสั่งซื้อ (Primary Key)
+user_id	INT	เชื่อมโยงกับผู้ใช้ใน tbl_users
+order_number	VARCHAR(50)	หมายเลขคำสั่งซื้อ เช่น ORD20251110-001
+total_amount	DECIMAL(10,2)	ยอดรวมคำสั่งซื้อ
+payment_status	ENUM	สถานะการชำระเงิน (pending, paid, cancelled, refunded)
+order_status	ENUM	สถานะคำสั่งซื้อ (processing, shipped, delivered, cancelled)
+payment_method	VARCHAR(50)	วิธีการชำระ เช่น credit_card, bank_transfer, cash
+shipping_address	TEXT	ที่อยู่จัดส่ง
+note	TEXT	หมายเหตุจากผู้ใช้
+created_at	TIMESTAMP	วันที่สั่งซื้อ
+updated_at	TIMESTAMP	วันที่อัปเดตล่าสุด
+#ตัวอย่างข้อมูลใน tbl_users
+id	firstname	fullname	lastname	username	status	created_at	updated_at
+1	Mr.	Anuchat	Rungsiyanon	admin01	active	2025-11-10 09:00:00	2025-11-10 09:00:00
+2	Mr.	Somchai 	Prasert	teacher02	active	2025-11-10 09:00:00	2025-11-10 09:00:00
+3	Miss	Malee	Boonmee	student03	inactive	2025-11-10 09:00:00	2025-11-10 09:00:00
+4	Mr.	Kittisak	Wongsa	user04	active	2025-11-10 09:00:00	2025-11-10 09:00:00
+5	Miss	Suda	Chaiwat	user05	active	2025-11-10 09:00:00	2025-11-10 09:00:00
+
+#ตัวอย่างข้อมูล tbl_orders
+
+id	user_id	order_number	total_amount	payment_status	order_status	payment_method	shipping_address	note
+1	1	ORD20251110-001	1500.00	paid	delivered	credit_card	123 Main Rd, Chiang Mai	Express
+2	2	ORD20251110-002	850.50	pending	processing	bank_transfer	45/2 Tapae Rd, Chiang Mai	Cash
+3	3	ORD20251110-003	1299.00	cancelled	cancelled	cash	89/10 Suthep, Chiang Mai	Cancel
+4	4	ORD20251110-004	2200.00	paid	shipped	promptpay	12 Nimman Rd, Chiang Mai	Bubble
+5	5	ORD20251110-005	990.00	paid	delivered	credit_card	99 Huaykaew Rd, Chiang Mai	gift
+6	5	ORD20251110-006	1990.00	paid	delivered	credit_card	99 Huaykaew Rd, Chiang Mai	gift
+7	3	ORD20251110-007	1000.00	paid	delivered	credit_card	89/10 Suthep, Chiang Mai	gift
+8	2	ORD20251110-008	10000.00	paid	delivered	credit_card	45/2 Tapae Rd, Chiang Mai	gift
+ 
+12. INER JOIN (เรียกข้อมูล 2 ตาราง)
+SELECT u.fullname, u.lastname, o.total_amount FROM tbl_users AS u INNER JOIN tbl_orders AS o ON u.id = o.user_id
+
+13. วิธีแก้และสั่งงานผ่าน Command Line ให้ภาษาไทยไม่เพี้ยน
+1. พิมพ์คำสั่งเปลี่ยน Code Page: chcp 65001
+2. จากนั้นค่อยต่อเข้า MySQL ด้วย Flag utf8mb4:  mysql --default-character-set=utf8mb4 -u root -p ชื่อฐานข้อมูล
