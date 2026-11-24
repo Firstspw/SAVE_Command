@@ -1,0 +1,9 @@
+mysql -u root -p
+show databases;
+USE ชื่อdatabases
+show TABLES;
+desc ชื่อฟิลด์ในตาราง
+
+สร้าง datadase
+CREATE DATABASE ชื่อdatadase;
+CREATE TABLE tbl_students ( student_id INT(10) NOT NULL AUTO_INCREMENT , student_firstname VARCHAR(50) NOT NULL, student_lastname VARCHAR(50) NOT NULL, PRIMARY KEY (student_id) );
